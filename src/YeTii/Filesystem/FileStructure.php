@@ -1,5 +1,5 @@
 <?php
-namespace YeTii\General;
+namespace YeTii\FileSystem;
 
 use YeTii\General\Str;
 use YeTii\General\Num;

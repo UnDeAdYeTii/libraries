@@ -1,5 +1,5 @@
 <?php
-namespace YeTii\General;
+namespace YeTii\Applications;
 
 class Ffmpeg {
 
