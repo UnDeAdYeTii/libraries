@@ -9,5 +9,10 @@
             "homepage": "https://github.com/UnDeAdYeTii/",
             "role": "Developer"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "YeTii\\": "src/Yetii/"
+        }
+    }
 }
