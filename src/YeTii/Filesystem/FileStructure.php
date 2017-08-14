@@ -41,14 +41,11 @@ class FileStructure {
 			$this->file_path = Str::replacePrefix($file_path_real, $this->base_path, '');
 		else
 			$this->file_path = $file_path_real;
-		printDie($file_path_real, false);
 		$this->file_path_real = $file_path_real;
-		printDie($this->file_path_real, false);
 		$this->filename = Str::afterLast(rtrim($this->file_path,'/'), '/');
 		$this->parent_path = Str::beforeLast(rtrim($this->file_path,'/'), '/');
 		$this->parent_path_real = Str::beforeLast(Str::parseDir($file_path_real), '/');
 		$this->parent_name = Str::afterLast($this->parent_path, '/');
-		printDie($this->get());
 	}
 
 	private function initialize() {
