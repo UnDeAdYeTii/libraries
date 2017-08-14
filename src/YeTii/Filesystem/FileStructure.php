@@ -10,29 +10,49 @@ class FileStructure {
 	protected $is_dir; // 1 or 0
 	protected $exists; // 1 or 0
 	protected $parent_path; // path of directory
+	protected $parent_path_real; // path of directory
 	protected $parent_name; // basename of parent_path
 	protected $file_path; // $parent_path/$filename
+	protected $file_path_real; // $parent_path/$filename
 	protected $file_size; // size in bytes
 	protected $date_modified; // date modified of file
 	protected $children; // children as FileStructure object
 	protected $children_count; // count of children
+	protected $base_path; // the path to ignore from prefix
 
 
 	// ------------------- INTERNAL FUNCTIONS ---------------------
 
-	function __construct($path = null, $get_recursive = FALSE, $get_children = TRUE) {
-		$this->settings = (object)array('get_children'=>$get_children, 'get_recursive'=>$get_recursive, 'show_hidden_files'=>1);
+	function __construct($path = null, array $args = []) {
+		$this->settings = (object)array(
+								'get_children'=>isset($args['get_children']) ? $args['get_children'] : TRUE,
+								'get_recursive'=>isset($args['recursive']) ? $args['recursive'] : TRUE,
+								'show_hidden_files'=>isset($args['show_hidden_files']) ? $args['show_hidden_files'] : TRUE,
+		);
 		if ($path) {
-			$this->file_path = $path;
+			$this->base_path = isset($args['base_path']) ? Str::parseDir($args['base_path']) : NULL;
+			$this->set_file_path($path);
 			$this->initialize();
 		}
 	}
 
-	private function initialize() {
-		if (!$this->file_path) return false;
+	private function set_file_path($file_path_real) {
+		if ($this->base_path!=null)
+			$this->file_path = Str::replacePrefix($file_path_real, $this->base_path, '');
+		else
+			$this->file_path = $file_path_real;
+		printDie($file_path_real, false);
+		$this->file_path_real = $file_path_real;
+		printDie($this->file_path_real, false);
 		$this->filename = Str::afterLast(rtrim($this->file_path,'/'), '/');
 		$this->parent_path = Str::beforeLast(rtrim($this->file_path,'/'), '/');
+		$this->parent_path_real = Str::beforeLast(Str::parseDir($file_path_real), '/');
 		$this->parent_name = Str::afterLast($this->parent_path, '/');
+		printDie($this->get());
+	}
+
+	private function initialize() {
+		if (!$this->file_path) return false;
 		if (file_exists($this->file_path)) {
 			$this->exists = 1;
 			$this->is_dir = is_dir($this->file_path);
@@ -117,7 +137,9 @@ class FileStructure {
 
 	// ------------------- PUBLIC FUNCTIONS ---------------------
 
-
+	public function base_path(string $path) {
+		$path = trim($path, '/');
+	}
 	public function mock_rename(string $to) {
 		$copy = clone $this;
 		$copy->filename = $to;
@@ -204,6 +226,23 @@ class FileStructure {
 		return $this->file_path;
 	}
 
+	public function breadcrumbs() {
+		$return = [];
+		$base = '';
+		foreach (explode('/', trim($this->file_path_real, '/')) as $crumb) {
+			if ($this->base_path && Str::contains($this->base_path, Str::parseDir($base, $crumb)))
+				continue;
+			$return[] = (object)array(
+				'filename'=>$crumb,
+				'file_path_real'=>Str::parseDir(Str::parseDir($this->base_path, $base), $crumb),
+				'file_path'=>$this->base_path ? Str::replacePrefix(Str::parseDir($base, $crumb), $this->base_path, '') : Str::parseDir($base, $crumb)
+			);
+			$base .= "/$crumb";
+		}
+		$this->breadcrumbs = $return;
+		return $return;
+	}
+
 
 
 
@@ -215,12 +254,15 @@ class FileStructure {
 			'is_dir'=>$this->is_dir,
 			'exists'=>$this->exists,
 			'parent_path'=>$this->parent_path,
+			'parent_path_real'=>$this->parent_path_real,
 			'parent_name'=>$this->parent_name,
 			'file_path'=>$this->file_path,
+			'file_path_real'=>$this->file_path_real,
 			'file_size'=>$this->file_size,
 			'date_modified'=>$this->date_modified,
 			'children'=>$this->get_children($this->children),
 			'children_count'=>$this->children_count,
+			'base_path'=>$this->base_path,
 		);
 	}
 
