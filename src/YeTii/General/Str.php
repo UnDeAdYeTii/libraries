@@ -180,4 +180,8 @@ class Str {
 	public static function stripExtension(string $string) {
 		return preg_replace('/\.([a-z0-9]+)$/i', '', $string);
 	}
+
+	public static function url(string $str) {
+		return trim(strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $str)), '-');
+	}
 }

@@ -1,6 +1,8 @@
 <?php
 namespace YeTii\Applications;
 
+use YeTii\General\Str;
+
 class Ffmpeg {
 
 	protected $format = 'mp4';
@@ -41,7 +43,7 @@ class Ffmpeg {
 		return $this;
 	}
 
-	public function from(FileStructure $value = NULL) {
+	public function from(\YeTii\FileSystem\FileStructure $value = NULL) {
 		if (!$value->exists()) {
 			$this->error = 'Input file not found at '.$value->file_path; return false;
 		}
@@ -49,7 +51,7 @@ class Ffmpeg {
 		return $this;
 	}
 
-	public function to(FileStructure $value = NULL) {
+	public function to(\YeTii\FileSystem\FileStructure $value = NULL) {
 		if ($ext = $value->getExt()) {
 			if (!in_array($ext, $this->formats_available)) {
 				$this->error = "Format .$ext is not supported"; return false;

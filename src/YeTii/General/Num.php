@@ -99,4 +99,12 @@ class Num {
 		}
 	}
 
+	public static function padZero($int, $length = 4) {
+		$int = (string)$int;
+		while(strlen($int)<$length) {
+			$int = '0'.$int;
+		}
+		return $int;
+	}
+
 }
