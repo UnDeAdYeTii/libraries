@@ -143,8 +143,8 @@ class Str {
 		return $this;
 	}
 	
-	private function replaceRegex(string $subject, string $find, string $replace = null, $ignoreCase = false) {
-		$this->value = $ignoreCase ? preg_replace("/$find/i", $replace, $subject) : preg_replace("/$find/", $replace, $subject);
+	private function replaceRegex(string $subject, string $find, string $replace = null) {
+		$this->value = preg_replace($find, $replace, $subject);
 		return $this;
 	}
 	
@@ -202,10 +202,7 @@ class Str {
 	}
 
 	private function words(string $string, string $delim = null, $ignoreEmpty = false) {
-		if (!is_null($delim)) {
-			$string = preg_replace('/['.preg_quote($delim, '/').']/', ' ', $string);
-		}
-		$split = preg_split('/(\s[\W]\s|[\s])/', $string);
+		$split = !is_null($delim) ? preg_split($delim, $string) : preg_split('/(\s[\W]\s|[\s])/', $string);
 		if (!$ignoreEmpty) return $split;
 		$return = [];
 		foreach ($split as $word) {
