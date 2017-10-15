@@ -4,9 +4,9 @@ use PHPUnit\Framework\TestCase;
 use YeTii\General\Str;
 
 /**
- * Class IsLowerCaseTest
+ * Class IsUpperCaseTest
  */
-class IsLowerCaseTest extends TestCase
+class IsUpperCaseTest extends TestCase
 {
     /**
      * @var string
@@ -16,18 +16,18 @@ class IsLowerCaseTest extends TestCase
     /**
      * Test whether it works correctly using the correct case
      */
-    public function testIsLowerCorrectCase()
+    public function testIsUpperCorrectCase()
     {
-        $str = new Str(strtolower($this->testString));
-        $this->assertTrue($str->isLowerCase());
+        $str = new Str(strtoupper($this->testString));
+        $this->assertTrue($str->isUpperCase());
     }
 
     /**
      * Test whether it works correctly using the incorrect case
      */
-    public function testIsLowerIncorrectCase()
+    public function testIsUpperIncorrectCase()
     {
         $str = new Str($this->testString);
-        $this->assertFalse($str->isLowerCase());
+        $this->assertFalse($str->isUpperCase());
     }
 }
