@@ -14,7 +14,7 @@ class HtmlTest extends TestCase
     public $testString = 'The quick brown fox jumps over the lazy dog, <i>Snowball</i>';
 
     /**
-     * Test whether it returns an array of the words
+     * Test whether it returns an HTML encoded string
      */
     public function testHtml()
     {
