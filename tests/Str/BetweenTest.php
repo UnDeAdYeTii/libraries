@@ -4,9 +4,9 @@ use PHPUnit\Framework\TestCase;
 use YeTii\General\Str;
 
 /**
- * Class BetweenGreedyTest
+ * Class BetweenTest
  */
-class BetweenGreedyTest extends TestCase
+class BetweenTest extends TestCase
 {
     /**
      * @var string
@@ -14,29 +14,29 @@ class BetweenGreedyTest extends TestCase
     public $testString = 'The quick brown fox jumps over the lazy dog, Snowball';
 
     /**
-     * Test whether it returns greedily between two strings
+     * Test whether it returns between two strings
      */
-    public function testBetweenGreedy()
+    public function testBetween()
     {
         $str = new Str($this->testString);
-        $str2 = $str->betweenGreedy('e', 'S');
+        $str2 = $str->between('e', 'S');
         $this->assertTrue($str2->value === ' quick brown fox jumps over the lazy dog, ');
     }
 
     /**
-     * Test whether it returns greedily between two incorrect strings
+     * Test whether it returns between two incorrect strings
      */
-    public function testBetweenGreedyInvalidStrings()
+    public function testBetweenInvalidStrings()
     {
         $str = new Str($this->testString);
-        $str2 = $str->betweenGreedy('e', 's');
+        $str2 = $str->between('e', 's');
         $this->assertFalse($str2->value === ' quick brown fox jumps over the lazy dog, ');
     }
 
     /**
-     * Test whether it returns greedily between two strings with ignore
+     * Test whether it returns between two strings with ignore
      */
-    public function testBetweenGreedyInvalidStringsWithIgnore()
+    public function testBetweenInvalidStringsWithIgnore()
     {
         $str = new Str($this->testString);
         $str2 = $str->betweenGreedy('e', 's', true);
