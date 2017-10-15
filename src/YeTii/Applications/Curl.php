@@ -1,151 +1,81 @@
 <?php
 namespace YeTii\Applications;
 
-use YeTii\General\Str;
-
 class Curl {
 
-	private $url = '';
-	private $method = 'GET';
-	private $methods_available = array('POST','GET','PUT','DELETE','PATCH','OPTIONS');
-	private $data = [];
-	private $timeout = 30;
-	private $returntransfer = TRUE;
-	private $encoding = '';
-	private $maxredirs = 10;
-	private $ssl_verifyhost = FALSE;
-	private $ssl_verifypeer = FALSE;
-	private $jsondecode_result = TRUE;
-
+	protected $ch;
+	protected $responseHeader;
+	protected $responseBody;
 	protected $error;
-	protected $success;
-	protected $response;
+	protected $httpCode;
+	protected $latency;
 
-	function __construct(array $arr = []) {
-		foreach ($arr as $key => $value) {
-			if ($key=='error'||$key=='success'||$key=='response') continue;
-			if (isset($this->{$key}))
-				$this->{$key} = $value;
+	function __construct($url = null) {
+		$this->ch = curl_init($url);
+		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 10);
+	    curl_setopt($this->ch, CURLOPT_TIMEOUT, 15);
+	    curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+	    curl_setopt($this->ch, CURLOPT_MAXREDIRS, 5);
+	    curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
+	    curl_setopt($this->ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Unknown) Gecko/20100101 Firefox/56.0');
+	    curl_setopt($this->ch, CURLOPT_HEADER, true);
+	}
+
+	public function __call($name, $arguments) {
+		if (method_exists($this, $name)) {
+			return call_user_func_array([$this, $name], $arguments);
+		}elseif(is_array($arguments) && !empty($arguments) && $const = @constant('CURLOPT_'.strtoupper($name))) {
+			curl_setopt($this->ch, $const, $arguments[0]);
+			return $this;
 		}
 	}
 
-	public function post($url) {
-		$this->url = $url;
-		$this->method = 'POST';
-		return $this;
+	public static function __callStatic($name, $arguments) {
+		$c = new Curl();
+		return call_user_func_array([$c, $name], $arguments);
 	}
-	public function get($url) {
-		$this->url = $url;
-		$this->method = 'GET';
-		return $this;
+
+	public function __toString() {
+		return $this->response();
 	}
-	public function put($url) {
-		$this->url = $url;
-		$this->method = 'PUT';
-		return $this;
+
+	private function execute() {
+	    $latency = 0;
+	    $response = curl_exec($this->ch);
+	    $error = curl_error($this->ch);
+	    $http_code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+	    $header_size = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
+	    $time = curl_getinfo($this->ch, CURLINFO_TOTAL_TIME);
+	    curl_close($this->ch);
+	    $this->responseHeader = substr($response, 0, $header_size);
+	    $this->responseBody = substr($response, $header_size);
+	    $this->error = $error;
+	    $this->httpCode = $http_code;
+	    $this->latency = round($time * 1000);
+	    return $this;
 	}
-	public function delete($url) {
-		$this->url = $url;
-		$this->method = 'DELETE';
-		return $this;
+
+	private function response() {
+		return $this->responseBody;
 	}
-	public function patch($url) {
-		$this->url = $url;
-		$this->method = 'PATCH';
-		return $this;
+
+	private function header() {
+		return $this->responseHeader;
 	}
-	public function options($url) {
-		$this->url = $url;
-		$this->method = 'OPTIONS';
-		return $this;
-	}
-	public function method($method) {
-		if (!in_array($method, $this->methods_available)) {
-			$this->error = "Unidentified method `$method`";
-			return false;
-		}
-		$this->method = $method;
-		return $this;
-	}
-	public function data($value) {
-		$this->data = (array)$value;
-		return $this;
-	}
-	public function timeout($value) {
-		$this->timeout = $value;
-		return $this;
-	}
-	public function returntransfer($value) {
-		$this->returntransfer = $value ? TRUE : FALSE;
-		return $this;
-	}
-	public function encoding($value) {
-		$this->encoding = $value;
-		return $this;
-	}
-	public function maxredirs($value) {
-		$this->maxredirs = $value;
-		return $this;
-	}
-	public function ssl_verifyhost($value) {
-		$this->ssl_verifyhost = $value ? TRUE : FALSE;
-		return $this;
-	}
-	public function ssl_verifypeer($value) {
-		$this->ssl_verifypeer = $value ? TRUE : FALSE;
-		return $this;
-	}
-	public function fetch($url = null) {
-		if ($url) $this->url = $url;
-		$this->do_curl();
-		return $this;
-	}
-	public function error() {
+
+	private function error() {
 		return $this->error;
 	}
-	public function response() {
-		if (!$this->response&&!$this->error&&!$this->success) $this->fetch();
-		return $this->response;
-	}
-	public function success() {
-		return $this->success;
+
+	private function httpCode() {
+		return $this->httpCode;
 	}
 
-	private function do_curl() {
-		$this->success = false;
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => $this->url,
-			CURLOPT_RETURNTRANSFER => $this->returntransfer,
-			CURLOPT_ENCODING => $this->encoding,
-			CURLOPT_MAXREDIRS => $this->maxredirs,
-			CURLOPT_TIMEOUT => $this->timeout ? $this->timeout : 30,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => $this->method,
-			CURLOPT_POSTFIELDS => $this->data ? $this->data : "{}",
-			CURLOPT_SSL_VERIFYHOST => $this->ssl_verifyhost,
-			CURLOPT_SSL_VERIFYPEER => $this->ssl_verifypeer
-		));
-		// $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		// $errorno = curl_errno($curl);
-		$this->response = curl_exec($curl);
-		$this->error = curl_error($curl);
-		$this->success = $this->response && !$this->error ? true : false;
-		if ($this->jsondecode_result)
-			$this->jsonify();
+	private function latency() {
+		return $this->latency;
 	}
 
-	public function jsonify() {
-		if (!is_string($this->response)) return $this;
-		if (preg_match('/^\{.+\}$/', $this->response)) {
-			$this->response = json_decode($this->response);
-			$this->success = true;
-		}else{
-			$this->error .= "\nInvalid JSON. Failed to jsonify";
-			$this->success = false;
-			$this->response = FALSE;
-		}
-		return $this;
-	}
+
 
 }

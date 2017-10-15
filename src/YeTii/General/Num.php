@@ -19,40 +19,34 @@ class Num {
 				}
 			}
 		}
-		printDie("return: $return");
 		return $return;
 	}
 
-	public static function romanNumeralsToInt(string $string) {
-		$string = strtoupper($string);
-		$str = str_split($string);
-		$table = array('M'=>1000, 'D'=>500, 'C'=>100, 'L'=>50, 'X'=>10, 'V'=>5, 'I'=>1);
-		$highest = INF;
-		$output=0;
-		for ($i=0;$i<count($str);$i++) {
-			$cr = Arr::at($str, $i);
-			$c = Arr::at($table, $cr);
-			if ($c>$highest)
-				return false; //invalid 
-			$nr = Arr::at($str, $i+1);
-			$n = Arr::at($table, $nr);
-			$anr = Arr::at($str, $i+2);
-			$an = Arr::at($table, $anr);
-			if ($c<$n) {
-				if ($n<$an) return false; // invalid, e.g. X-C-M, XC: okay, XCM: not
-				if ($nr && ($nr!=$cr)) {
-					$highest = $n;
+	public static function romanNumeralsToInt(string $orig) {
+		$string = strtoupper($orig);
+		if (!preg_match('/^[IVXLCDM]+$/', $string))
+			return false;
+		$numerals = array('M'=>1000,'CM'=>900,'D'=>500,'CD'=>400,'C'=>100,'XC'=>90,'L'=>50,'XL'=>40,'X'=>10,'IX'=>9,'V'=>5,'IV'=>4,'I'=>1);
+		$result = 0; $blacklist = [];
+		foreach ($numerals as $key => $value) {
+			if (in_array($key, $blacklist)) return false;
+			for ($i=0;$i<3;$i++) {  // max 3 in a row
+				if (strpos($string, $key) === 0) {
+					$result += $value;
+					$string = substr($string, strlen($key));
+					if (strlen($key)==2)
+						$blacklist[] = $key[1];
 				}
-			}else{
-				if ($c<$an) return false; // invalid, e.g. X-C-M, XC: okay, XCM: not
+				if (!in_array($key, ['M','C','X','I']))
+					$i=3;
 			}
-			$output += ($c<$n) ? 0-$c : $c;
+			$blacklist[] = $key;
 		}
-		return $output;
+		return $result;
 	}
 
 	public static function isRomanNumerals(string $string) {
-		return preg_match('/^[IVXLCDM]+$/', $string) && self::romanNumeralsToInt($string) ? TRUE : FALSE;
+		return boolval(self::romanNumeralsToInt($string));
 	}
 
 	public static function readMath(string $string) {

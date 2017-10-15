@@ -1,6 +1,9 @@
 <?php
 namespace YeTii\Applications;
 
+/* 
+	Project abandoned
+ */
 use YeTii\General\Str;
 
 class Ffmpeg {
