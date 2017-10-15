@@ -16,7 +16,7 @@ class StringContainsTest extends TestCase
     /**
      * Test whether it matches using the correct case
      */
-    public function testContainsLowerCase()
+    public function testContainsCorrectCase()
     {
         $str = new Str($this->testString);
         $this->assertTrue($str->contains('fox'));
@@ -25,7 +25,7 @@ class StringContainsTest extends TestCase
     /**
      * Test whether it doesn't match using the incorrect case
      */
-    public function testContainsUpperCaseWithoutIgnore()
+    public function testContainsIncorrectCaseWithoutIgnore()
     {
         $str = new Str($this->testString);
         $this->assertFalse($str->contains('FOX'));
@@ -34,7 +34,7 @@ class StringContainsTest extends TestCase
     /**
      * Test whether it detects using the incorrect case with case-insensitive
      */
-    public function testContainsUpperCaseWithIgnore()
+    public function testContainsIncorrectCaseWithIgnore()
     {
         $str = new Str($this->testString);
         $this->assertTrue($str->contains('FOX', true));
