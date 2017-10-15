@@ -59,3 +59,36 @@ Str::contains($haystack, $needle); // notice the difference? $str->contains($nee
 Str::html($haystack); // and $str->html();
 Str::replace($haystack, $find, $replace, $ignoreCase); // and $str->replace($find, $replace, $ignoreCase);
 ```
+
+
+## YeTii\General\Arr
+An Array class with built-in helpful functions
+Unlike Str class, Arr cannot automatically cast to an Array, you'll need to go `$arr->toArray()` (`$arr->toObject()` is also supported)
+
+```php
+$arr = new Arr(['apple, 'orange', 'banana']);
+$arr->indexOf($needle, $default = null); // get the index of $needle ('banana' would be '1')
+$arr->indexesOf($needle, $default = null); // Like indexOf() except it will return an array, containing indexes of all matches
+$arr->at($needle, $default = null); // get value where key==$needle
+$arr->get($key, $default = null, $delim = '.'); // Similar to at, however allows dot-notation naviagation ('user.settings.display_box') looks for $arr['user']['settings']['display_box'])
+$arr->set($needle, $value = null, $delim = '.'); // like get() but set. Will create subarrays as needed.
+$arr->extend($arr1 [, $arr2...]); // merge function
+$arr->merge($arr1 [, $arr2...]); // alias of extend
+$arr->shuffle(); // shuffle the array
+$arr->length(); // get length of array
+$arr->keys(); // get array keys in array
+$arr->values(); // grab array of values in array
+$arr->map(function($val) {
+	return shuffle($val);
+}); // map a closure or callback to each value in array
+$arr->append($new_val); // append a value to the end of an array
+$arr->prepend($new_val); // prepend a value to the beginning of an array
+$arr->first(); // shift first element off array, return shifted value
+$arr->last(); // pop last element off array, return popped value
+
+
+// You can also use Arr class statically (MUST pass source string variable before other args)
+Arr::indexOf($array, $needle, $default = null); // notice the difference? $arr->indexOf($needle, $default = null);
+Arr::at($array, $needle, $default = null); // and $arr->at($needle, $default = null);
+Arr::keys($array); // and $arr->keys();
+```
