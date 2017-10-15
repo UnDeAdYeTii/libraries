@@ -1,7 +1,6 @@
 # libraries
+
 Collection of classes/libs
-
-
 
 ## YeTii\General\Str
 A String class with built-in helpful functions.
