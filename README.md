@@ -49,7 +49,7 @@ $str->html(); // return htmlspecialchars version of string
 $str->newline($newline = "\n"); // normalize newlines to $newline
 $str->reverse(); // return reversed string
 $str->acronym($outputCapitalised = false, $ignoreLowerCase = false); // return acronym of string ('Laugh out loud' would be 'Lol'). Capitalised output: 'LOL' and ignore-lowercase: 'L'
-$str->parseDir($path [, $...]); // concatenate all args (or array arg) into valid directory string delimitered by single slash
+$str->parseDir($path1 [, $path2...]); // concatenate all string args into valid directory string delimitered by single slash
 $str->stripExtension(); // Remove extension ('Readme.txt' would be 'Readme')
 $str->url(); // Make url-friendly version of the string (lowercase + only A-Z and 0-9 and hyphens for spaces)
 

@@ -229,8 +229,7 @@ class Str {
 		return $this;
 	}
 
-	private function newline(string $subject, $newline = null) {
-		if ($newline===null) $newline = "\n";
+	private function newline(string $subject, $newline = "\n") {
 		$this->value = preg_replace('/\R/u', $newline, $subject);
 		return $this;
 	}
@@ -266,7 +265,7 @@ class Str {
 	}
 
 	private function url(string $str) {
-		$this->value = trim(strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $str)), '-');
+		$this->value = trim(strtolower(preg_replace('/[^a-z0-9]+/i', '-', $str)), '-');
 		return $this;
 	}
 }
