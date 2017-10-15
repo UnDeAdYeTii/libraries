@@ -1,11 +1,12 @@
 <?php
 
+use PHPUnit\Framework\TestCase;
 use YeTii\General\Str;
 
 /**
  * Class StringContainsTest
  */
-class StringContainsTest extends \PHPUnit\Framework\TestCase
+class StringContainsTest extends TestCase
 {
     /**
      * @var string
