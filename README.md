@@ -1,7 +1,10 @@
 # libraries
 Collection of classes/libs
 
+## Unit Testing
 
+This package uses [PHPUnit](https://phpunit.de) for it's unit tests. To run the test suite, use the following:  
+`php vendor/bin/phpunit` or `phpunit` (if installed globally)
 
 ## YeTii\General\Str
 A String class with built-in helpful functions.
