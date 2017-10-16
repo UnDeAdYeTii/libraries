@@ -170,7 +170,6 @@ class Str {
 
 	private function replaceSuffix(string $subject, string $find, string $replace = null, $ignoreCase = false) {
 		$this->value = $this->endsWith($subject, $find, $ignoreCase) ? (string)$this->replaceLast($subject, $find, $replace, $ignoreCase) : $subject;
-		printDie($this->value, false);
 		return $this;
 	}
 

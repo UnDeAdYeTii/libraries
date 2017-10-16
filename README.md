@@ -2,6 +2,11 @@
 
 Collection of classes/libs
 
+## Unit Testing
+
+This package uses [PHPUnit](https://phpunit.de) for it's unit tests. To run the test suite, use the following:  
+`php vendor/bin/phpunit` or `phpunit` (if installed globally)
+
 ## YeTii\General\Str
 A String class with built-in helpful functions.
 Hint: The Str class can be directly printed as a string to print its string value (`echo $str`)
@@ -65,7 +70,7 @@ An Array class with built-in helpful functions
 Unlike Str class, Arr cannot automatically cast to an Array, you'll need to go `$arr->toArray()` (`$arr->toObject()` is also supported)
 
 ```php
-$arr = new Arr(['apple, 'orange', 'banana']);
+$arr = new Arr(['apple', 'orange', 'banana']);
 $arr->indexOf($needle, $default = null); // get the index of $needle ('banana' would be '1')
 $arr->indexesOf($needle, $default = null); // Like indexOf() except it will return an array, containing indexes of all matches
 $arr->at($needle, $default = null); // get value where key==$needle

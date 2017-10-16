@@ -1,11 +1,11 @@
 <?php
 namespace YeTii\Applications;
 
-/* 
-	Project abandoned
- */
 use YeTii\General\Str;
 
+/**
+ * @deprecated 0.2.0 - This class is abandoned
+ */
 class Ffmpeg {
 
 	protected $format = 'mp4';
