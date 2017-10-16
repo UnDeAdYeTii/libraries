@@ -66,7 +66,7 @@ An Array class with built-in helpful functions
 Unlike Str class, Arr cannot automatically cast to an Array, you'll need to go `$arr->toArray()` (`$arr->toObject()` is also supported)
 
 ```php
-$arr = new Arr(['apple, 'orange', 'banana']);
+$arr = new Arr(['apple', 'orange', 'banana']);
 $arr->indexOf($needle, $default = null); // get the index of $needle ('banana' would be '1')
 $arr->indexesOf($needle, $default = null); // Like indexOf() except it will return an array, containing indexes of all matches
 $arr->at($needle, $default = null); // get value where key==$needle
