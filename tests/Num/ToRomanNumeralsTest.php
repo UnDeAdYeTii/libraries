@@ -1,5 +1,7 @@
 <?php
 
+namespace Yetii\Tests\Num;
+
 use PHPUnit\Framework\TestCase;
 use YeTii\General\Num;
 

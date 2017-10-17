@@ -1,5 +1,7 @@
 <?php
 
+namespace Yetii\Tests\Str;
+
 use PHPUnit\Framework\TestCase;
 use YeTii\General\Str;
 
