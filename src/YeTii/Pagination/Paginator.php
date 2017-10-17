@@ -2,22 +2,62 @@
 
 namespace YeTii\Pagination;
 
+/**
+ * Class Paginator
+ */
 class Paginator
 {
+    /**
+     * @var string
+     */
     protected $base_url = ''; // /community/show/thread-1/
+    /**
+     * @var string
+     */
     protected $url_suffix = ''; // ?sort=seedsorder=asc
+    /**
+     * @var string
+     */
     protected $group_open = '<div class="pages topmarg5px botmarg5px floatright" base_url="{base_url}" url_suffix="{url_suffix}" num_pages="{num_pages}" cur_page="{cur_page}"> <a class="turnoverButton siteButton bigButton faTurnoverButton" onclick="page_specify($(this));" title="Go to a specific page"><i class="fa fa-search"></i></a>';
+    /**
+     * @var string
+     */
     protected $link_current = '<a class="turnoverButton siteButton bigButton active">{page_num}</a>';
+    /**
+     * @var string
+     */
     protected $link_number = '<a class="turnoverButton siteButton bigButton" rel="nofollow" href="{base_url}{page_num}/{url_suffix}" title="Go to page {page_num}">{page_num}</a>';
+    /**
+     * @var string
+     */
     protected $link_gap = '<a class="turnoverButton siteButton blank nohov"><i class="fa fa-ellipsis-h"></i></a>';
+    /**
+     * @var string
+     */
     protected $group_close = '</div>';
+    /**
+     * @var int
+     */
     protected $num_links = 9; // e.g. "1 ... 6 7 8 <9> 10 11 12 ... 34" = 9 buttons
+    /**
+     * @var int
+     */
     protected $per_page = 100; // items per page
+    /**
+     * @var int
+     */
     protected $total_rows = 1; // all records in db
+    /**
+     * @var int
+     */
     protected $cur_page = 1; // current page num
 
     // --------------------------------------------------------------------
 
+    /**
+     * Paginator constructor.
+     * @param array $params
+     */
     public function __construct($params = [])
     {
         $this->initialize($params);
@@ -25,6 +65,10 @@ class Paginator
         return $this->create_links();
     }
 
+    /**
+     * @param array $params
+     * @return $this
+     */
     public function initialize(array $params = [])
     {
         foreach ($params as $key => $val) {
@@ -120,6 +164,10 @@ class Paginator
         return $this->wrap_links($output);
     }
 
+    /**
+     * @param $buttons
+     * @return string
+     */
     private function wrap_links($buttons)
     {
         return $this->group_open . $buttons . $this->group_close;
