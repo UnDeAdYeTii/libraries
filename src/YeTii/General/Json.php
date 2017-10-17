@@ -1,16 +1,27 @@
 <?php
+
 namespace YeTii\General;
 
-use YeTii\General\Debug;
+/**
+ * Class Json
+ */
+class Json
+{
+    /**
+     * @param      $json
+     * @param bool $die
+     */
+    public static function output($json, $die = false)
+    {
+        Debug::json($json, $die);
+    }
 
-class Json {
-
-	public static function output($json, $die = FALSE) {
-		Debug::json($json, $die);
-	}
-	
-	public static function toString($json) {
-		return json_decode($json);
-	}
-
+    /**
+     * @param $json
+     * @return mixed
+     */
+    public static function toString($json)
+    {
+        return json_decode($json);
+    }
 }

@@ -1,81 +1,148 @@
 <?php
+
 namespace YeTii\Applications;
 
-class Curl {
+/**
+ * Class Curl
+ */
+class Curl
+{
+    /**
+     * @var resource
+     */
+    protected $ch;
+    /**
+     * @var string
+     */
+    protected $responseHeader;
+    /**
+     * @var string
+     */
+    protected $responseBody;
+    /**
+     * @var string
+     */
+    protected $error;
+    /**
+     * @var int
+     */
+    protected $httpCode;
+    /**
+     * @var float
+     */
+    protected $latency;
 
-	protected $ch;
-	protected $responseHeader;
-	protected $responseBody;
-	protected $error;
-	protected $httpCode;
-	protected $latency;
+    /**
+     * Curl constructor.
+     * @param string|null $url
+     */
+    public function __construct($url = null)
+    {
+        $this->ch = curl_init($url);
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($this->ch, CURLOPT_MAXREDIRS, 5);
+        curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($this->ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Unknown) Gecko/20100101 Firefox/56.0');
+        curl_setopt($this->ch, CURLOPT_HEADER, true);
+    }
 
-	function __construct($url = null) {
-		$this->ch = curl_init($url);
-		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 10);
-	    curl_setopt($this->ch, CURLOPT_TIMEOUT, 15);
-	    curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-	    curl_setopt($this->ch, CURLOPT_MAXREDIRS, 5);
-	    curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
-	    curl_setopt($this->ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Unknown) Gecko/20100101 Firefox/56.0');
-	    curl_setopt($this->ch, CURLOPT_HEADER, true);
-	}
+    /**
+     * @param $name
+     * @param $arguments
+     * @return $this|mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if (method_exists($this, $name)) {
+            return call_user_func_array([$this, $name], $arguments);
+        } elseif (is_array($arguments) && !empty($arguments) && $const = @constant('CURLOPT_' . strtoupper($name))) {
+            curl_setopt($this->ch, $const, $arguments[0]);
 
-	public function __call($name, $arguments) {
-		if (method_exists($this, $name)) {
-			return call_user_func_array([$this, $name], $arguments);
-		}elseif(is_array($arguments) && !empty($arguments) && $const = @constant('CURLOPT_'.strtoupper($name))) {
-			curl_setopt($this->ch, $const, $arguments[0]);
-			return $this;
-		}
-	}
+            return $this;
+        }
+    }
 
-	public static function __callStatic($name, $arguments) {
-		$c = new Curl();
-		return call_user_func_array([$c, $name], $arguments);
-	}
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        $c = new Curl();
 
-	public function __toString() {
-		return $this->response();
-	}
+        return call_user_func_array([$c, $name], $arguments);
+    }
 
-	private function execute() {
-	    $latency = 0;
-	    $response = curl_exec($this->ch);
-	    $error = curl_error($this->ch);
-	    $http_code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
-	    $header_size = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
-	    $time = curl_getinfo($this->ch, CURLINFO_TOTAL_TIME);
-	    curl_close($this->ch);
-	    $this->responseHeader = substr($response, 0, $header_size);
-	    $this->responseBody = substr($response, $header_size);
-	    $this->error = $error;
-	    $this->httpCode = $http_code;
-	    $this->latency = round($time * 1000);
-	    return $this;
-	}
+    /**
+     * @return mixed
+     */
+    public function __toString()
+    {
+        return $this->response();
+    }
 
-	private function response() {
-		return $this->responseBody;
-	}
+    /**
+     * @return $this
+     */
+    private function execute()
+    {
+        $latency = 0;
+        $response = curl_exec($this->ch);
+        $error = curl_error($this->ch);
+        $http_code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        $header_size = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
+        $time = curl_getinfo($this->ch, CURLINFO_TOTAL_TIME);
+        curl_close($this->ch);
+        $this->responseHeader = substr($response, 0, $header_size);
+        $this->responseBody = substr($response, $header_size);
+        $this->error = $error;
+        $this->httpCode = $http_code;
+        $this->latency = round($time * 1000);
 
-	private function header() {
-		return $this->responseHeader;
-	}
+        return $this;
+    }
 
-	private function error() {
-		return $this->error;
-	}
+    /**
+     * @return mixed
+     */
+    private function response()
+    {
+        return $this->responseBody;
+    }
 
-	private function httpCode() {
-		return $this->httpCode;
-	}
+    /**
+     * @return mixed
+     */
+    private function header()
+    {
+        return $this->responseHeader;
+    }
 
-	private function latency() {
-		return $this->latency;
-	}
+    /**
+     * @return mixed
+     */
+    private function error()
+    {
+        return $this->error;
+    }
 
+    /**
+     * @return mixed
+     */
+    private function httpCode()
+    {
+        return $this->httpCode;
+    }
 
-
+    /**
+     * @return mixed
+     */
+    private function latency()
+    {
+        return $this->latency;
+    }
 }
