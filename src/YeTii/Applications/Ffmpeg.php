@@ -1,87 +1,135 @@
 <?php
+
 namespace YeTii\Applications;
 
+use YeTii\FileSystem\FileStructure;
 use YeTii\General\Str;
 
 /**
  * @deprecated 0.2.0 - This class is abandoned
  */
-class Ffmpeg {
+class Ffmpeg
+{
 
-	protected $format = 'mp4';
-	protected $ffmpeg_dir = '/usr/local/bin/ffmpeg';
-	protected $delete_original = 0;
+    protected $format = 'mp4';
+    protected $ffmpeg_dir = '/usr/local/bin/ffmpeg';
+    protected $delete_original = 0;
 
-	protected $input;
-	protected $output;
+    protected $input;
+    protected $output;
 
-	protected $error;
+    protected $error;
 
-	private $formats_available = array('mp4','mkv','avi','m4v','mpg','flv');
+    private $formats_available = ['mp4', 'mkv', 'avi', 'm4v', 'mpg', 'flv'];
 
-	function __construct(array $args = []) {
-		if (isset($args['format'])) $this->format($args['format']);
-		if (isset($args['ffmpeg_dir'])) $this->format($args['ffmpeg_dir']);
-		if (isset($args['delete_original'])) $this->format($args['delete_original']);
-	}
+    public function __construct(array $args = [])
+    {
+        if (isset($args['format'])) {
+            $this->format($args['format']);
+        }
+        if (isset($args['ffmpeg_dir'])) {
+            $this->format($args['ffmpeg_dir']);
+        }
+        if (isset($args['delete_original'])) {
+            $this->format($args['delete_original']);
+        }
+    }
 
-	public function format($value = NULL) {
-		if (!in_array($value, $this->formats_available)) {
-			$this->error = 'Unknown format: .'.$value; return FALSE;
-		}
-		$this->format = $value;
-		return $this;
-	}
+    public function format($value = null)
+    {
+        if (!in_array($value, $this->formats_available)) {
+            $this->error = 'Unknown format: .' . $value;
 
-	public function ffmpeg_dir($value = NULL) {
-		if (!file_exists($value)) {
-			$this->error = 'ffmpeg not found in '.$value; return FALSE;
-		}
-		$this->ffmpeg_dir = $value;
-		return $this;
-	}
+            return false;
+        }
+        $this->format = $value;
 
-	public function delete_original($value = NULL) {
-		$this->delete_original = $value ? 1 : 0;
-		return $this;
-	}
+        return $this;
+    }
 
-	public function from(\YeTii\FileSystem\FileStructure $value = NULL) {
-		if (!$value->exists()) {
-			$this->error = 'Input file not found at '.$value->file_path; return false;
-		}
-		$this->input = $value;
-		return $this;
-	}
+    public function ffmpeg_dir($value = null)
+    {
+        if (!file_exists($value)) {
+            $this->error = 'ffmpeg not found in ' . $value;
 
-	public function to(\YeTii\FileSystem\FileStructure $value = NULL) {
-		if ($ext = $value->getExt()) {
-			if (!in_array($ext, $this->formats_available)) {
-				$this->error = "Format .$ext is not supported"; return false;
-			}else{
-				$this->format = $ext;
-				$value = $value->mock_rename(Str::stripExtension($value->filename()));
-			}
-		}
-		$this->output = $value;
-		return $this;
-	}
+            return false;
+        }
+        $this->ffmpeg_dir = $value;
 
-	private function ready() {
-		if ($this->error) return false;
-		if (!$this->input->exists()) return false;
-		if (file_exists($this->output->file_path().'.'.$this->format)) {
-			$this->error = 'File already exists at '.$this->output->file_path().'.'.$this->format; return false;
-		}
-		return true;
-	}
+        return $this;
+    }
 
-	public function mux() {
-		if (!$this->ready()) return NULL;
-		$str = exec($this->ffmpeg_dir.' -i "'.$this->input->file_path().'" -c copy "'.$this->output->file_path().'.'.$this->format.'" 2>&1');
-		if (preg_match('/video:/', $str) && $this->delete_original)
-			$this->input->delete();
-		return preg_match('/video:/', $str) ? true : false;
-	}
+    public function delete_original($value = null)
+    {
+        $this->delete_original = $value ? 1 : 0;
+
+        return $this;
+    }
+
+    public function from(FileStructure $value = null)
+    {
+        if (!$value->exists()) {
+            $this->error = 'Input file not found at ' . $value->file_path;
+
+            return false;
+        }
+        $this->input = $value;
+
+        return $this;
+    }
+
+    public function to(FileStructure $value = null)
+    {
+        if ($ext = $value->getExt()) {
+            if (!in_array($ext, $this->formats_available)) {
+                $this->error = "Format .$ext is not supported";
+
+                return false;
+            } else {
+                $this->format = $ext;
+                $value = $value->mock_rename(Str::stripExtension($value->filename()));
+            }
+        }
+        $this->output = $value;
+
+        return $this;
+    }
+
+    private function ready()
+    {
+        if ($this->error) {
+            return false;
+        }
+        if (!$this->input->exists()) {
+            return false;
+        }
+        if (file_exists($this->output->file_path() . '.' . $this->format)) {
+            $this->error = 'File already exists at ' . $this->output->file_path() . '.' . $this->format;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function mux()
+    {
+        if (!$this->ready()) {
+            return null;
+        }
+        $str = exec($this->ffmpeg_dir
+                    . ' -i "'
+                    . $this->input->file_path()
+                    . '" -c copy "'
+                    . $this->output->file_path()
+                    . '.'
+                    . $this->format
+                    . '" 2>&1');
+        if (preg_match('/video:/', $str) && $this->delete_original) {
+            $this->input->delete();
+        }
+
+        return preg_match('/video:/', $str) ? true : false;
+    }
 
 }
