@@ -5,25 +5,72 @@ namespace YeTii\FileSystem;
 use YeTii\General\Num;
 use YeTii\General\Str;
 
+/**
+ * Class FileStructure
+ */
 class FileStructure
 {
+    /**
+     * @var string
+     */
     protected $filename; // name of file or folder
+    /**
+     * @var int|bool
+     */
     protected $is_dir; // 1 or 0
+    /**
+     * @var int|bool
+     */
     protected $exists; // 1 or 0
+    /**
+     * @var string
+     */
     protected $parent_path; // path of directory
+    /**
+     * @var string
+     */
     protected $parent_path_real; // path of directory
+    /**
+     * @var string
+     */
     protected $parent_name; // basename of parent_path
+    /**
+     * @var string
+     */
     protected $file_path; // $parent_path/$filename
+    /**
+     * @var string
+     */
     protected $file_path_real; // $parent_path/$filename
+    /**
+     * @var int
+     */
     protected $file_size; // size in bytes
+    /**
+     * @var int
+     */
     protected $date_modified; // date modified of file
+    /**
+     * @var array
+     */
     protected $children; // children as FileStructure object
+    /**
+     * @var int
+     */
     protected $children_count; // count of children
+    /**
+     * @var $this|null
+     */
     protected $base_path; // the path to ignore from prefix
 
 
     // ------------------- INTERNAL FUNCTIONS ---------------------
 
+    /**
+     * FileStructure constructor.
+     * @param string|null  $path
+     * @param array $args
+     */
     function __construct($path = null, array $args = [])
     {
         $this->settings = (object)[
@@ -38,6 +85,9 @@ class FileStructure
         }
     }
 
+    /**
+     * @param $file_path_real
+     */
     private function set_file_path($file_path_real)
     {
         if ($this->base_path != null) {
@@ -55,6 +105,9 @@ class FileStructure
         printDie($this->get());
     }
 
+    /**
+     * @return bool
+     */
     private function initialize()
     {
         if (!$this->file_path) {
@@ -71,6 +124,10 @@ class FileStructure
         }
     }
 
+    /**
+     * @param $path
+     * @return int
+     */
     private function filesize($path)
     {
         if (!is_dir($path)) {
@@ -86,6 +143,10 @@ class FileStructure
         return $size;
     }
 
+    /**
+     * @param $path
+     * @return bool
+     */
     private function filedelete($path)
     {
         if (file_exists($path)) {
@@ -106,6 +167,11 @@ class FileStructure
         }
     }
 
+    /**
+     * @param $path
+     * @param $search
+     * @return bool
+     */
     private function internalfind($path, $search)
     {
         if (!isset($this->tmp)) {
@@ -156,6 +222,10 @@ class FileStructure
         return true;
     }
 
+    /**
+     * @param $children
+     * @return array|null
+     */
     private function get_children($children)
     {
         if (empty($children)) {
@@ -172,11 +242,18 @@ class FileStructure
 
     // ------------------- PUBLIC FUNCTIONS ---------------------
 
+    /**
+     * @param string $path
+     */
     public function base_path(string $path)
     {
         $path = trim($path, '/');
     }
 
+    /**
+     * @param string $to
+     * @return FileStructure
+     */
     public function mock_rename(string $to)
     {
         $copy = clone $this;
@@ -186,6 +263,10 @@ class FileStructure
         return $copy;
     }
 
+    /**
+     * @param string $to
+     * @return bool
+     */
     public function rename(string $to)
     {
         if (!$this->exists) {
@@ -204,6 +285,10 @@ class FileStructure
         $this->file_path = $new_path;
     }
 
+    /**
+     * @param $what
+     * @return bool
+     */
     public function find($what)
     {
         if (is_string($what) && preg_match('/^\/(.+)\/(|[igsm]+)$/', $what)) {
@@ -221,6 +306,9 @@ class FileStructure
         return $return;
     }
 
+    /**
+     * @return array|null
+     */
     public function children()
     {
         if (!$this->is_dir) {
@@ -241,6 +329,10 @@ class FileStructure
         return $this->children;
     }
 
+    /**
+     * @param int $levels
+     * @return null
+     */
     public function parent($levels = 1)
     {
         if ($tmp = rtrim($this->parent_path, '/')) {
@@ -260,11 +352,17 @@ class FileStructure
         }
     }
 
+    /**
+     * @return bool
+     */
     public function delete()
     {
         return $this->filedelete($this->file_path);
     }
 
+    /**
+     * @return bool|null
+     */
     public function getExt()
     {
         if ($this->is_dir) {
@@ -274,31 +372,49 @@ class FileStructure
         return preg_match('/\.([a-z0-9]+)$/i', $this->filename, $m) ? $m[1] : null;
     }
 
+    /**
+     * @param null $match
+     * @return bool|string
+     */
     public function hasExt($match = null)
     {
         if ($this->is_dir) {
             return false;
         }
 
+        $ext = null;
+
         return $ext = $this->getExt() ? (is_string($match) ? $ext == $match : (is_array($match) ? in_array($ext,
             $match) : $ext ? true : 'false')) : false;
     }
 
+    /**
+     * @return mixed
+     */
     public function exists()
     {
         return $this->exists;
     }
 
+    /**
+     * @return mixed
+     */
     public function filename()
     {
         return $this->filename;
     }
 
+    /**
+     * @return mixed
+     */
     public function file_path()
     {
         return $this->file_path;
     }
 
+    /**
+     * @return array
+     */
     public function breadcrumbs()
     {
         $return = [];
@@ -323,6 +439,9 @@ class FileStructure
 
     // ------------------- TO OBJECT ---------------------
 
+    /**
+     * @return object
+     */
     public function get()
     {
         return (object)[
