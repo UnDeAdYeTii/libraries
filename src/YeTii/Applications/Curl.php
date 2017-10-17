@@ -10,7 +10,7 @@ class Curl {
 	protected $httpCode;
 	protected $latency;
 
-	function __construct($url = null) {
+	public function __construct($url = null) {
 		$this->ch = curl_init($url);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 10);
