@@ -2,10 +2,19 @@
 
 namespace YeTii\General;
 
+/**
+ * Class Arr
+ */
 class Arr
 {
+    /**
+     * @var array|mixed
+     */
     public $value;
 
+    /**
+     * Arr constructor.
+     */
     public function __construct()
     {
         $arr = [];
@@ -19,6 +28,11 @@ class Arr
         $this->value = $arr;
     }
 
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
     public function __call($name, $arguments)
     {
         if (method_exists($this, $name)) {
@@ -28,6 +42,11 @@ class Arr
         }
     }
 
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
     public static function __callStatic($name, $arguments)
     {
         $s = new YeTii\General\Arr();
@@ -35,21 +54,36 @@ class Arr
         return call_user_func_array([$s, $name], $arguments);
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return json_encode($this->value);
     }
 
+    /**
+     * @return array|mixed
+     */
     public function toArray()
     {
         return $this->value;
     }
 
+    /**
+     * @return object
+     */
     public function toObject()
     {
         return (object)$this->value;
     }
 
+    /**
+     * @param array $haystack
+     * @param       $needle
+     * @param null  $default
+     * @return false|int|null|string
+     */
     private function indexOf(array $haystack, $needle, $default = null)
     {
         $index = array_search($needle, $haystack);
@@ -57,6 +91,12 @@ class Arr
         return $index ? $index : $default;
     }
 
+    /**
+     * @param array $haystack
+     * @param       $needle
+     * @param array $default
+     * @return array
+     */
     private function indexesOf(array $haystack, $needle, $default = [])
     {
         $indexes = [];
@@ -69,11 +109,24 @@ class Arr
         return $indexes ? $indexes : $default;
     }
 
+    /**
+     * @param array $haystack
+     * @param       $index
+     * @param null  $default
+     * @return mixed|null
+     */
     private function at(array $haystack, $index, $default = null)
     {
         return isset($haystack[$index]) ? $haystack[$index] : $default;
     }
 
+    /**
+     * @param array  $array
+     * @param        $key
+     * @param null   $default
+     * @param string $delim
+     * @return array|mixed|null
+     */
     private function get(array $array, $key, $default = null, $delim = '.')
     {
         $keys = explode($delim, $key);
@@ -89,6 +142,13 @@ class Arr
         return $tmp;
     }
 
+    /**
+     * @param array  $array
+     * @param        $key
+     * @param null   $value
+     * @param string $delim
+     * @return $this
+     */
     private function set(array $array, $key, $value = null, $delim = '.')
     {
         $keys = explode($delim, $key);
@@ -107,6 +167,9 @@ class Arr
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     private function extend()
     {
         $arrays = func_get_args();
@@ -125,6 +188,9 @@ class Arr
         return $base;
     }
 
+    /**
+     * @return $this
+     */
     private function merge()
     {
         $arr = call_user_func_array([$this, 'extend'], func_get_args());
@@ -133,6 +199,10 @@ class Arr
         return $this;
     }
 
+    /**
+     * @param array $array
+     * @return $this
+     */
     private function shuffle(array $array)
     {
         shuffle($array);
@@ -141,26 +211,48 @@ class Arr
         return $this;
     }
 
+    /**
+     * @param array $array
+     * @return int
+     */
     private function length(array $array)
     {
         return count($array);
     }
 
+    /**
+     * @param array $array
+     * @return array
+     */
     private function keys(array $array)
     {
         return array_keys($array);
     }
 
+    /**
+     * @param array $array
+     * @return array
+     */
     private function values(array $array)
     {
         return array_values($array);
     }
 
+    /**
+     * @param array $array
+     * @param       $function
+     * @return array
+     */
     private function map(array $array, $function)
     {
         return array_map($function, $array);
     }
 
+    /**
+     * @param array $array
+     * @param       $add
+     * @return $this
+     */
     private function append(array $array, $add)
     {
         array_push($array, $add);
@@ -169,6 +261,11 @@ class Arr
         return $this;
     }
 
+    /**
+     * @param array $array
+     * @param       $add
+     * @return $this
+     */
     private function prepend(array $array, $add)
     {
         array_unshift($array, $add);
@@ -177,6 +274,11 @@ class Arr
         return $this;
     }
 
+    /**
+     * @param array $array
+     * @param int   $length
+     * @return array|bool
+     */
     private function last(array $array, int $length = 1)
     {
         if (!$length) {
@@ -194,6 +296,11 @@ class Arr
         return $arr;
     }
 
+    /**
+     * @param array $array
+     * @param int   $length
+     * @return array|bool
+     */
     private function first(array $array, int $length = 1)
     {
         if (!$length) {

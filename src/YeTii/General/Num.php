@@ -2,8 +2,15 @@
 
 namespace YeTii\General;
 
+/**
+ * Class Num
+ */
 class Num
 {
+    /**
+     * @param int $integer
+     * @return string
+     */
     public static function toRomanNumerals($integer = 0)
     {
         $integer = (int)$integer;
@@ -35,6 +42,10 @@ class Num
         return $return;
     }
 
+    /**
+     * @param string $orig
+     * @return bool|int|mixed
+     */
     public static function romanNumeralsToInt(string $orig)
     {
         $string = strtoupper($orig);
@@ -79,11 +90,19 @@ class Num
         return $result;
     }
 
+    /**
+     * @param string $string
+     * @return bool
+     */
     public static function isRomanNumerals(string $string)
     {
         return boolval(self::romanNumeralsToInt($string));
     }
 
+    /**
+     * @param string $string
+     * @return bool|float|int|null
+     */
     public static function readMath(string $string)
     {
         if (preg_match('/^(\d+)\s*([\-\+\/\*])\s*(\d+)$/', $string, $m)) {
@@ -93,6 +112,12 @@ class Num
         }
     }
 
+    /**
+     * @param $arg1
+     * @param $modifier
+     * @param $arg2
+     * @return float|int|null
+     */
     public static function customEquation($arg1, $modifier, $arg2)
     {
         switch ($modifier) {
@@ -130,6 +155,11 @@ class Num
         }
     }
 
+    /**
+     * @param     $int
+     * @param int $length
+     * @return string
+     */
     public static function padZero($int, $length = 4)
     {
         $int = (string)$int;

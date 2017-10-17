@@ -2,11 +2,24 @@
 
 namespace YeTii\General;
 
+/**
+ * Class Debug
+ */
 class Debug
 {
+    /**
+     * @var bool
+     */
     private static $styles_added = false;
+    /**
+     * @var string
+     */
     private static $method = 'print_r'; // print_r|json
 
+    /**
+     * @param      $var
+     * @param bool $die
+     */
     public static function json($var, $die = true)
     {
         self::$method = 'json';
@@ -14,6 +27,10 @@ class Debug
         return self::dump($var, $die);
     }
 
+    /**
+     * @param      $var
+     * @param bool $die
+     */
     public static function print($var, $die = true)
     {
         self::$method = 'print_r';
@@ -21,6 +38,10 @@ class Debug
         return self::dump($var, $die);
     }
 
+    /**
+     * @param      $var
+     * @param bool $die
+     */
     public static function dump($var, $die = true)
     {
         $html = '';
@@ -64,6 +85,11 @@ class Debug
         }
     }
 
+    /**
+     * @param        $variable
+     * @param string $name
+     * @return array|object|string
+     */
     private static function debug_makevisible($variable, $name = 'main')
     {
         $is_object = is_object($variable);
@@ -95,6 +121,9 @@ class Debug
         return $variable;
     }
 
+    /**
+     *
+     */
     private static function init_style()
     {
         if (self::$styles_added) {
