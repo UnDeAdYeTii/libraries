@@ -2,16 +2,40 @@
 
 namespace YeTii\Applications;
 
+/**
+ * Class Curl
+ */
 class Curl
 {
-
+    /**
+     * @var resource
+     */
     protected $ch;
+    /**
+     * @var string
+     */
     protected $responseHeader;
+    /**
+     * @var string
+     */
     protected $responseBody;
+    /**
+     * @var string
+     */
     protected $error;
+    /**
+     * @var int
+     */
     protected $httpCode;
+    /**
+     * @var float
+     */
     protected $latency;
 
+    /**
+     * Curl constructor.
+     * @param string|null $url
+     */
     public function __construct($url = null)
     {
         $this->ch = curl_init($url);
@@ -25,6 +49,11 @@ class Curl
         curl_setopt($this->ch, CURLOPT_HEADER, true);
     }
 
+    /**
+     * @param $name
+     * @param $arguments
+     * @return $this|mixed
+     */
     public function __call($name, $arguments)
     {
         if (method_exists($this, $name)) {
@@ -36,6 +65,11 @@ class Curl
         }
     }
 
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
     public static function __callStatic($name, $arguments)
     {
         $c = new Curl();
@@ -43,11 +77,17 @@ class Curl
         return call_user_func_array([$c, $name], $arguments);
     }
 
+    /**
+     * @return mixed
+     */
     public function __toString()
     {
         return $this->response();
     }
 
+    /**
+     * @return $this
+     */
     private function execute()
     {
         $latency = 0;
@@ -66,30 +106,43 @@ class Curl
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     private function response()
     {
         return $this->responseBody;
     }
 
+    /**
+     * @return mixed
+     */
     private function header()
     {
         return $this->responseHeader;
     }
 
+    /**
+     * @return mixed
+     */
     private function error()
     {
         return $this->error;
     }
 
+    /**
+     * @return mixed
+     */
     private function httpCode()
     {
         return $this->httpCode;
     }
 
+    /**
+     * @return mixed
+     */
     private function latency()
     {
         return $this->latency;
     }
-
-
 }

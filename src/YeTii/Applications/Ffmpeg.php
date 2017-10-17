@@ -10,18 +10,42 @@ use YeTii\General\Str;
  */
 class Ffmpeg
 {
-
+    /**
+     * @var string
+     */
     protected $format = 'mp4';
+    /**
+     * @var string
+     */
     protected $ffmpeg_dir = '/usr/local/bin/ffmpeg';
+    /**
+     * @var int
+     */
     protected $delete_original = 0;
 
+    /**
+     * @var string
+     */
     protected $input;
+    /**
+     * @var string
+     */
     protected $output;
 
+    /**
+     * @var string
+     */
     protected $error;
 
+    /**
+     * @var array
+     */
     private $formats_available = ['mp4', 'mkv', 'avi', 'm4v', 'mpg', 'flv'];
 
+    /**
+     * Ffmpeg constructor.
+     * @param array $args
+     */
     public function __construct(array $args = [])
     {
         if (isset($args['format'])) {
@@ -35,6 +59,10 @@ class Ffmpeg
         }
     }
 
+    /**
+     * @param null $value
+     * @return $this|bool
+     */
     public function format($value = null)
     {
         if (!in_array($value, $this->formats_available)) {
@@ -47,6 +75,10 @@ class Ffmpeg
         return $this;
     }
 
+    /**
+     * @param null $value
+     * @return $this|bool
+     */
     public function ffmpeg_dir($value = null)
     {
         if (!file_exists($value)) {
@@ -59,6 +91,10 @@ class Ffmpeg
         return $this;
     }
 
+    /**
+     * @param null $value
+     * @return $this
+     */
     public function delete_original($value = null)
     {
         $this->delete_original = $value ? 1 : 0;
@@ -66,6 +102,10 @@ class Ffmpeg
         return $this;
     }
 
+    /**
+     * @param FileStructure|null $value
+     * @return $this|bool
+     */
     public function from(FileStructure $value = null)
     {
         if (!$value->exists()) {
@@ -78,6 +118,10 @@ class Ffmpeg
         return $this;
     }
 
+    /**
+     * @param FileStructure|null $value
+     * @return $this|bool
+     */
     public function to(FileStructure $value = null)
     {
         if ($ext = $value->getExt()) {
@@ -95,6 +139,9 @@ class Ffmpeg
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     private function ready()
     {
         if ($this->error) {
@@ -112,6 +159,9 @@ class Ffmpeg
         return true;
     }
 
+    /**
+     * @return bool|null
+     */
     public function mux()
     {
         if (!$this->ready()) {
@@ -131,5 +181,4 @@ class Ffmpeg
 
         return preg_match('/video:/', $str) ? true : false;
     }
-
 }
