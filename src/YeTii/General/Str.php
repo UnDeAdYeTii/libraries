@@ -58,6 +58,14 @@ class Str
     }
 
     /**
+     * @return string
+     */
+    public function toString()
+    {
+        return $this->value;
+    }
+
+    /**
      * @param string $haystack
      * @param string $needle
      * @param bool   $ignoreCase
