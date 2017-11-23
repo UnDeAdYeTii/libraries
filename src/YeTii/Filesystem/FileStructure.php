@@ -1,4 +1,8 @@
 <?php
+ /**
+  * @deprecated
+  * @deprecated No longer in use. Highly recommend not using this class
+  */
 
 namespace YeTii\FileSystem;
 

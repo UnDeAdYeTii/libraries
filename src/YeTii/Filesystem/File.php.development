@@ -1,4 +1,8 @@
 <?php
+ /**
+  * @todo
+  * @todo I have not finished yet. Likely to be buggy :p
+  */
 namespace YeTii\FileSystem;
 
 use YeTii\General\Str;

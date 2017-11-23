@@ -34,10 +34,7 @@ class Str
             array_unshift($arguments, $this->value);
 
             $s = new Str($this->value);
-            return call_user_func_array([
-                $s,
-                $name
-            ], $arguments);
+            return call_user_func_array([$s, $name], $arguments);
         }
     }
 
