@@ -13,7 +13,8 @@ class Json
      */
     public static function output($json, $die = false)
     {
-        Debug::json($json, $die);
+        header('Content-type: application/json');
+        echo json_encode($json);die();
     }
 
     /**
@@ -22,6 +23,7 @@ class Json
      */
     public static function toString($json)
     {
-        return json_decode($json);
+        return json_encode($json);
     }
+
 }

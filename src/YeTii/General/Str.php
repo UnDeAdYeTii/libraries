@@ -33,7 +33,11 @@ class Str
         if (method_exists($this, $name)) {
             array_unshift($arguments, $this->value);
 
-            return call_user_func_array([$this, $name], $arguments);
+            $s = new Str($this->value);
+            return call_user_func_array([
+                $s,
+                $name
+            ], $arguments);
         }
     }
 
@@ -626,13 +630,95 @@ class Str
     }
 
     /**
-     * @param string $str
+     * @param string $string
      * @return $this
      */
-    private function url(string $str)
+    private function hasExtension(string $string)
+    {
+        return boolval(preg_match('/\.([a-z0-9]+)$/i', $string));
+    }
+
+    /**
+     * @param string $string
+     * @param mixed $default
+     * @return $this
+     */
+    private function getExtension(string $string, $default = null)
+    {
+        preg_match('/\.([a-z0-9]+)$/i', $string, $m);
+        return isset($m[1]) ? $m[1] : $default;
+    }
+
+    /**
+     * @param string $string
+     * @return $this
+     */
+    private function url(string $string)
     {
         $this->value = trim(strtolower(preg_replace('/[^a-z0-9]+/i', '-', $str)), '-');
 
         return $this;
+    }
+
+    /**
+     * @param string $string
+     * @return $this
+     */
+    private function camelCase(string $string) {
+        $string = preg_replace('/(?<!\ )(?<![A-Z])[A-Z]/', ' $0', $string);
+        $words = $this->words($string, '/\W|_/', true);
+
+        $words = array_map('strtolower', $words);
+
+        $words = array_map('ucfirst', $words);
+        $this->value = lcfirst(implode('', $words));
+
+        return $this;
+    }
+
+    /**
+     * @param string $string
+     * @return $this
+     */
+    private function pascalCase(string $string) {
+        $this->value = ucfirst($this->camelCase($string));
+
+        return $this;
+    }
+
+    /**
+     * @param string $string
+     * @return $this
+     */
+    private function snakeCase(string $string) {
+        $string = preg_replace('/(?<!\ )(?<![A-Z])[A-Z]/', ' $0', $string);
+        $words = $this->words($string, '/\W/', true);
+        $this->value = strtolower(implode('_', $words));
+
+        return $this;
+    }
+
+    /**
+     * @param string $string
+     * @return bool
+     */
+    private function isCamelCase(string $string) {
+        return $string==$this->camelCase($string);
+    }
+
+    /**
+     * @param string $string
+     * @return bool
+     */
+    private function isPascalCase(string $string) {
+        return $string==$this->pascalCase($string);
+    }
+
+    /**
+     * @param string $string
+     * @return bool
+     */
+    private function isSnakeCase(string $string) {
+        return $string==$this->snakeCase($string);
     }
 }

@@ -32,6 +32,10 @@ class Curl
      */
     protected $latency;
 
+    protected $http_methods = [
+        'get', 'post', 'put', 'patch', 'delete', 'options', 'head'
+    ];
+
     /**
      * Curl constructor.
      * @param string|null $url
@@ -58,11 +62,19 @@ class Curl
     {
         if (method_exists($this, $name)) {
             return call_user_func_array([$this, $name], $arguments);
+        }elseif(in_array($name, $this->http_methods)) {
+            $this->customrequest(strtoupper($name));
+            foreach ($arguments as $arg) {
+                if (is_array($arg)||is_object($arg)) {
+                    foreach ($arg as $key => $value) {
+                        $this->{$key}($value);
+                    }
+                }
+            }
         } elseif (is_array($arguments) && !empty($arguments) && $const = @constant('CURLOPT_' . strtoupper($name))) {
             curl_setopt($this->ch, $const, $arguments[0]);
-
-            return $this;
         }
+        return $this;
     }
 
     /**
@@ -111,6 +123,14 @@ class Curl
      */
     private function response()
     {
+        if ($this->expect_json) {
+            if (strlen($this->responseBody) && $this->responseBody[0]=='{')
+                return json_decode($this->responseBody);
+            else{
+                return new \StdClass;
+            }
+        }
+
         return $this->responseBody;
     }
 
@@ -144,5 +164,10 @@ class Curl
     private function latency()
     {
         return $this->latency;
+    }
+
+    private function expectJson($value = true) {
+        $this->expect_json = boolval($value);
+        return $this;
     }
 }

@@ -13,7 +13,10 @@
     "autoload": {
         "psr-4": {
             "YeTii\\": "src/YeTii/"
-        }
+        },
+        "files": [
+            "src/YeTii/Helpers/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
