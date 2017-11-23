@@ -126,7 +126,7 @@ class Curl
         if ($this->expect_json) {
             if (strlen($this->responseBody) && $this->responseBody[0]=='{')
                 return json_decode($this->responseBody);
-            else{
+            }else{
                 return new \StdClass;
             }
         }
