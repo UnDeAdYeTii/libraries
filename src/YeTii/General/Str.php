@@ -31,7 +31,7 @@ class Str
     public function __call($name, $arguments)
     {
         if (method_exists($this, $name)) {
-            array_unshift($arguments, $this->value);
+            // array_unshift($arguments, $this->value);
 
             $s = new Str($this->value);
             return call_user_func_array([$s, $name], $arguments);
@@ -45,7 +45,11 @@ class Str
      */
     public static function __callStatic($name, $arguments)
     {
-        $s = new Str();
+        if (!is_array($arguments)||empty($arguments))
+            return new Str();
+
+        $str = array_shift($arguments);
+        $s = new Str($str);
 
         return call_user_func_array([$s, $name], $arguments);
     }
@@ -67,228 +71,230 @@ class Str
     }
 
     /**
-     * @param string $haystack
      * @param string $needle
      * @param bool   $ignoreCase
      * @return bool
      */
-    private function contains(string $haystack, string $needle, $ignoreCase = false)
+    private function contains(string $needle, $ignoreCase = false)
     {
-        return boolval($ignoreCase ? substr_count(strtolower($haystack), strtolower($needle)) : substr_count($haystack, $needle));
+        $value = $this->value;
+        return boolval($ignoreCase ? substr_count(strtolower($value), strtolower($needle)) : substr_count($value, $needle));
     }
 
     /**
-     * @param string $haystack
-     * @param string $needle
-     * @param bool   $ignoreCase
-     * @return bool|int
-     */
-    private function indexFirst(string $haystack, string $needle, $ignoreCase = false)
-    {
-        return $ignoreCase ? stripos($haystack, $needle) : strpos($haystack, $needle);
-    }
-
-    /**
-     * @param string $haystack
      * @param string $needle
      * @param bool   $ignoreCase
      * @return bool|int
      */
-    private function indexLast(string $haystack, string $needle, $ignoreCase = false)
+    private function indexFirst(string $needle, $ignoreCase = false)
     {
-        return $ignoreCase ? strripos($haystack, $needle) : strrpos($haystack, $needle);
+        $value = $this->value;
+        return $ignoreCase ? stripos($value, $needle) : strpos($value, $needle);
     }
 
     /**
-     * @param string $haystack
+     * @param string $needle
+     * @param bool   $ignoreCase
+     * @return bool|int
+     */
+    private function indexLast(string $needle, $ignoreCase = false)
+    {
+        $value = $this->value;
+        return $ignoreCase ? strripos($value, $needle) : strrpos($value, $needle);
+    }
+
+    /**
      * @param string $needle
      * @param bool   $ignoreCase
      * @return bool
      */
-    private function startsWith(string $haystack, string $needle, $ignoreCase = false)
+    private function startsWith(string $needle, $ignoreCase = false)
     {
+        $value = $this->value;
         return boolval($needle === ""
-                       || ($ignoreCase ? strripos($haystack, $needle, -strlen($haystack)) : strrpos($haystack, $needle,
-                -strlen($haystack))) !== false);
+                       || ($ignoreCase ? strripos($value, $needle, -strlen($value)) : strrpos($value, $needle,
+                -strlen($value))) !== false);
     }
 
     /**
-     * @param string $haystack
      * @param string $needle
      * @param bool   $ignoreCase
      * @return bool
      */
-    private function endsWith(string $haystack, string $needle, $ignoreCase = false)
+    private function endsWith(string $needle, $ignoreCase = false)
     {
+        $value = $this->value;
         return boolval($needle === ""
-                       || (($temp = strlen($haystack) - strlen($needle)) >= 0
-                           && ($ignoreCase ? stripos($haystack, $needle, $temp) : strpos($haystack, $needle, $temp)) !== false));
+                       || (($temp = strlen($value) - strlen($needle)) >= 0
+                           && ($ignoreCase ? stripos($value, $needle, $temp) : strpos($value, $needle, $temp)) !== false));
     }
 
     /**
-     * @param string $string
      * @param string $delimiter
      * @param bool   $ignoreCase
      * @return $this
      */
-    private function afterLast(string $string, string $delimiter, $ignoreCase = false)
+    private function afterLast(string $delimiter, $ignoreCase = false)
     {
-        $pos = $this->indexLast($string, $delimiter, $ignoreCase);
-        $this->value = $pos ? substr($string, $pos + 1) : $string;
+        $value = $this->value;
+        $pos = $this->indexLast($delimiter, $ignoreCase);
+        $this->value = $pos ? substr($value, $pos+strlen($delimiter)) : $value;
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param string $delimiter
      * @param bool   $ignoreCase
      * @return $this
      */
-    private function beforeLast(string $string, string $delimiter, $ignoreCase = false)
+    private function beforeLast(string $delimiter, $ignoreCase = false)
     {
-        $this->value = substr($string, 0, ($ignoreCase ? strripos($string, $delimiter) : strrpos($string, $delimiter)));
+        $value = $this->value;
+        $pos = $this->indexLast($delimiter, $ignoreCase);
+        $this->value = $pos ? substr($value, 0, $pos) : $value;
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param string $delimiter
      * @param bool   $ignoreCase
      * @return $this
      */
-    private function afterFirst(string $string, string $delimiter, $ignoreCase = false)
+    private function afterFirst(string $delimiter, $ignoreCase = false)
     {
-        $pos = $this->indexFirst($string, $delimiter, $ignoreCase);
-        $this->value = $pos ? substr($string, $pos + 1) : '';
+        $value = $this->value;
+        $pos = $this->indexFirst($delimiter, $ignoreCase);
+        $this->value = $pos ? substr($value, $pos+strlen($delimiter)) : '';
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param string $delimiter
      * @param bool   $ignoreCase
      * @return $this
      */
-    private function beforeFirst(string $string, string $delimiter, $ignoreCase = false)
+    private function beforeFirst(string $delimiter, $ignoreCase = false)
     {
-        $this->value = substr($string, 0, $this->indexFirst($string, $delimiter, $ignoreCase));
+        $value = $this->value;
+        $pos = $this->indexFirst($delimiter, $ignoreCase);
+        $this->value = $pos ? substr($value, 0, $pos) : $value;
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param int    $length
      * @return $this
      */
-    private function first(string $string, int $length)
+    private function first(int $length)
     {
-        $this->value = strlen($string) < $length ? $string : substr($string, 0, $length);
+        $value = $this->value;
+        $this->value = strlen($value) < $length ? $value : substr($value, 0, $length);
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param int    $length
      * @return $this
      */
-    private function last(string $string, int $length)
+    private function last(int $length)
     {
-        $this->value = strlen($string) < $length ? $string : substr($string, -$length);
+        $value = $this->value;
+        $this->value = strlen($value) < $length ? $value : substr($value, -$length);
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @return bool
      */
-    private function isLowerCase(string $string)
+    private function isLowerCase()
     {
-        return boolval($string === strtolower($string));
+        $value = $this->value;
+        return boolval($value === strtolower($value));
     }
 
     /**
-     * @param string $string
      * @return bool
      */
-    private function isUpperCase(string $string)
+    private function isUpperCase()
     {
-        return boolval($string === strtoupper($string));
+        $value = $this->value;
+        return boolval($value === strtoupper($value));
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function toLowerCase(string $string)
+    private function toLowerCase()
     {
-        $this->value = strtolower($string);
+        $value = $this->value;
+        $this->value = strtolower($value);
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function toUpperCase(string $string)
+    private function toUpperCase()
     {
-        $this->value = strtoupper($string);
+        $value = $this->value;
+        $this->value = strtoupper($value);
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @return bool
      */
-    private function isCapitalized(string $string)
+    private function isCapitalized()
     {
-        return boolval(strlen($string) ? $string[0] == strtoupper($string[0]) : false);
+        $value = $this->value;
+        return boolval(strlen($value) ? $value[0] == strtoupper($value[0]) : false);
     }
 
     /**
-     * @param string $string
      * @param bool   $forceLowerCaseOther
      * @return bool
      */
-    private function isCapitalizedWords(string $string, $forceLowerCaseOther = false)
+    private function isCapitalizedWords($forceLowerCaseOther = false)
     {
-        return boolval($string == strval($this->capitalizeWords($string, $forceLowerCaseOther)));
+        $value = $this->value;
+        return boolval($value == strval($this->capitalizeWords($forceLowerCaseOther)));
     }
 
     /**
-     * @param string $string
      * @param bool   $forceLowerCaseOther
      * @return $this
      */
-    private function capitalizeWords(string $string, $forceLowerCaseOther = false)
+    private function capitalizeWords($forceLowerCaseOther = false)
     {
-        $string = $forceLowerCaseOther ? ucwords(strtolower($string)) : ucwords($string);
+        $value = $this->value;
+        $value = $forceLowerCaseOther ? ucwords(strtolower($value)) : ucwords($value);
 
         foreach (['-', '\'', '.', ' '] as $delimiter) {
-            if (strpos($string, $delimiter) !== false) {
-                $string = implode($delimiter, array_map('ucfirst', explode($delimiter, $string)));
+            if (strpos($value, $delimiter) !== false) {
+                $value = implode($delimiter, array_map('ucfirst', explode($delimiter, $value)));
             }
         }
-        $this->value = $string;
+        $this->value = $value;
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param bool   $forceLowerCaseOther
      * @return $this
      */
-    private function capitalizeTitle(string $string, $forceLowerCaseOther = false)
+    private function capitalizeTitle($forceLowerCaseOther = false)
     {
-        $words = explode(' ', $this->capitalizeWords($string, $forceLowerCaseOther));
+        $value = $this->value;
+        $words = explode(' ', $this->capitalizeWords($forceLowerCaseOther));
         for ($i = 0; $i < count($words); $i++) {
             if (!$i) {
                 continue;
@@ -309,200 +315,213 @@ class Str
     }
 
     /**
-     * @param string $string
      * @return bool
      */
-    private function isRomanNumerals(string $string)
+    private function isRomanNumerals()
     {
-        return boolval(Num::isRomanNumerals($string));
+        $value = $this->value;
+        return boolval(Num::isRomanNumerals($value));
     }
 
     /**
-     * @param string      $subject
      * @param string      $find
      * @param string|null $replace
      * @param bool        $ignoreCase
      * @return $this
      */
-    private function replace(string $subject, string $find, string $replace = null, $ignoreCase = false)
+    private function replace(string $find, string $replace = null, $ignoreCase = false)
     {
-        $this->value = $ignoreCase ? str_ireplace($find, $replace, $subject) : str_replace($find, $replace, $subject);
+        $value = $this->value;
+        $this->value = $ignoreCase ? str_ireplace($find, $replace, $value) : str_replace($find, $replace, $value);
 
         return $this;
     }
 
     /**
-     * @param string      $subject
      * @param string      $find
-     * @param string|null $replace
+     * @param string      $replace
      * @return $this
      */
-    private function replaceRegex(string $subject, string $find, string $replace = null)
+    private function replaceRegex(string $find, string $replace = '')
     {
-        $this->value = preg_replace($find, $replace, $subject);
+        $value = $this->value;
+        $this->value = preg_replace($find, $replace, $value);
 
         return $this;
     }
 
     /**
-     * @param string      $haystack
+     * Alias of replaceRegex();
+     * @param string      $find
+     * @param string      $replace
+     * @return $this
+     */
+    private function regexReplace(string $find, string $replace = '') {
+        return $this->replaceRegex($find, $replace);
+    }
+
+    /**
      * @param string      $needle
      * @param string|null $replace
      * @param bool        $ignoreCase
      * @return $this
      */
-    private function replaceFirst(string $haystack, string $needle, string $replace = null, $ignoreCase = false)
+    private function replaceFirst(string $needle, string $replace = null, $ignoreCase = false)
     {
-        $this->value = (($pos = ($ignoreCase ? stripos($haystack, $needle) : strpos($haystack, $needle)))
-                        !== false) ? substr_replace($haystack, $replace, $pos, strlen($needle)) : $haystack;
+        $value = $this->value;
+        $this->value = (($pos = ($ignoreCase ? stripos($value, $needle) : strpos($value, $needle)))
+                        !== false) ? substr_replace($value, $replace, $pos, strlen($needle)) : $value;
 
         return $this;
     }
 
     /**
-     * @param string      $haystack
      * @param string      $needle
      * @param string|null $replace
      * @param bool        $ignoreCase
      * @return $this
      */
-    private function replaceLast(string $haystack, string $needle, string $replace = null, $ignoreCase = false)
+    private function replaceLast(string $needle, string $replace = null, $ignoreCase = false)
     {
-        $this->value = (($pos = ($ignoreCase ? strripos($haystack, $needle) : strrpos($haystack, $needle)))
-                        !== false) ? substr_replace($haystack, $replace, $pos, strlen($needle)) : $haystack;
+        $value = $this->value;
+        $this->value = (($pos = ($ignoreCase ? strripos($value, $needle) : strrpos($value, $needle)))
+                        !== false) ? substr_replace($value, $replace, $pos, strlen($needle)) : $value;
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param string $suffix
      * @param bool   $ifNotExists
      * @param bool   $ignoreCase
      * @return $this
      */
-    private function suffix(string $string, string $suffix, $ifNotExists = false, $ignoreCase = false)
+    private function suffix(string $suffix, $ifNotExists = false, $ignoreCase = false)
     {
-        $this->value = $ifNotExists && $this->endsWith($string, $suffix, $ignoreCase) ? $string : $string . $suffix;
+        $value = $this->value;
+        $this->value = $ifNotExists && $this->endsWith($suffix, $ignoreCase) ? $value : $value . $suffix;
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param string $prefix
      * @param bool   $ifNotExists
      * @param bool   $ignoreCase
      * @return $this
      */
-    private function prefix(string $string, string $prefix, $ifNotExists = false, $ignoreCase = false)
+    private function prefix(string $prefix, $ifNotExists = false, $ignoreCase = false)
     {
-        $this->value = $ifNotExists && $this->startsWith($string, $prefix, $ignoreCase) ? $string : $prefix . $string;
+        $value = $this->value;
+        $this->value = $ifNotExists && $this->startsWith($prefix, $ignoreCase) ? $value : $prefix . $value;
 
         return $this;
     }
 
     /**
-     * @param string      $subject
      * @param string      $find
      * @param string|null $replace
      * @param bool        $ignoreCase
      * @return $this
      */
-    private function replaceSuffix(string $subject, string $find, string $replace = null, $ignoreCase = false)
+    private function replaceSuffix(string $find, string $replace = null, $ignoreCase = false)
     {
-        $this->value = $this->endsWith($subject, $find, $ignoreCase) ? (string)$this->replaceLast($subject, $find, $replace,
-            $ignoreCase) : $subject;
+        $value = $this->value;
+        $this->value = $this->endsWith($find, $ignoreCase) ? (string)$this->replaceLast($find, $replace,
+            $ignoreCase) : $value;
 
         return $this;
     }
 
     /**
-     * @param string      $subject
      * @param string      $find
      * @param string|null $replace
      * @param bool        $ignoreCase
      * @return $this
      */
-    private function replacePrefix(string $subject, string $find, string $replace = null, $ignoreCase = false)
+    private function replacePrefix(string $find, string $replace = null, $ignoreCase = false)
     {
-        $this->value = $this->startsWith($subject, $find, $ignoreCase) ? (string)$this->replaceFirst($subject, $find, $replace,
-            $ignoreCase) : $subject;
+        $value = $this->value;
+        $this->value = $this->startsWith($find, $ignoreCase) ? (string)$this->replaceFirst($find, $replace,
+            $ignoreCase) : $value;
 
         return $this;
     }
 
     /**
-     * @param string      $string
      * @param string      $first
      * @param string|null $last
      * @param bool        $ignoreCase
      * @return $this
      */
-    private function betweenGreedy(string $string, string $first, string $last = null, $ignoreCase = false)
+    private function betweenGreedy(string $first, string $last = null, $ignoreCase = false)
     {
+        $value = $this->value;
         if ($last === null) {
             $last = $first;
         }
-        $this->value = (string)$this->afterFirst((string)$this->beforeLast($string, $last, $ignoreCase), $first, $ignoreCase);
+        $this->value = (string)$this->beforeLast($last, $ignoreCase);
+        $this->value = (string)$this->afterFirst($first, $ignoreCase);
 
         return $this;
     }
 
     /**
-     * @param string      $string
      * @param string      $first
      * @param string|null $last
      * @param bool        $ignoreCase
      * @return $this
      */
-    private function between(string $string, string $first, string $last = null, $ignoreCase = false)
+    private function between(string $first, string $last = null, $ignoreCase = false)
     {
+        $value = $this->value;
         if ($last === null) {
             $last = $first;
         }
-        $this->value = (string)$this->beforeFirst((string)$this->afterFirst($string, $first, $ignoreCase), $last, $ignoreCase);
+        $this->value = (string)$this->afterFirst($first, $ignoreCase);
+        $this->value = (string)$this->beforeFirst($last, $ignoreCase);
 
         return $this;
     }
 
     /**
-     * @param string      $string
      * @param string      $first
      * @param string|null $last
      * @param bool        $ignoreCase
      * @return $this
      */
-    private function betweenLazy(string $string, string $first, string $last = null, $ignoreCase = false)
+    private function betweenLazy(string $first, string $last = null, $ignoreCase = false)
     {
+        $value = $this->value;
         if ($last === null) {
             $last = $first;
         }
-        $this->value = (string)$this->afterLast((string)$this->beforeLast($string, $last, $ignoreCase), $first, $ignoreCase);
+        $this->value = (string)$this->beforeLast($last, $ignoreCase);
+        $this->value = (string)$this->afterLast($first, $ignoreCase);
 
         return $this;
     }
 
     /**
-     * @param string $string1
-     * @param string $string2
+     * @param string $toMatch
      * @param bool   $ignoreCase
      * @return bool
      */
-    private function equals(string $string1, string $string2, $ignoreCase = false)
+    private function equals(string $toMatch, $ignoreCase = false)
     {
-        return boolval($ignoreCase ? strtolower($string1) === strtolower($string2) : $string1 === $string2);
+        $value = $this->value;
+        return boolval($ignoreCase ? strtolower($value) === strtolower($toMatch) : $value === $toMatch);
     }
 
     /**
-     * @param string      $string
      * @param string|null $delim
      * @param bool        $ignoreEmpty
      * @return array|false|string[]
      */
-    private function words(string $string, string $delim = null, $ignoreEmpty = false)
+    private function words(string $delim = null, $ignoreEmpty = false)
     {
-        $split = !is_null($delim) ? preg_split($delim, $string) : preg_split('/(\s[\W]\s|[\s])/', $string);
+        $value = $this->value;
+        $split = !is_null($delim) ? preg_split($delim, $value) : preg_split('/(\s[\W]\s|[\s])/', $value);
         if (!$ignoreEmpty) {
             return $split;
         }
@@ -517,78 +536,78 @@ class Str
     }
 
     /**
-     * @param string      $string
      * @param string|null $delim
      * @param bool        $ignoreEmpty
      * @return int
      */
-    private function wordCount(string $string, string $delim = null, $ignoreEmpty = false)
+    private function wordCount(string $delim = null, $ignoreEmpty = false)
     {
-        return count($this->words($string, $delim, $ignoreEmpty));
+        $value = $this->value;
+        return count($this->words($delim, $ignoreEmpty));
     }
 
     /**
-     * @param string $string
      * @return array
      */
-    private function characters(string $string)
+    private function characters()
     {
-        return str_split($string);
+        $value = $this->value;
+        return str_split($value);
     }
 
     /**
-     * @param string $string
      * @return int
      */
-    private function length(string $string)
+    private function length()
     {
-        return strlen($string);
+        $value = $this->value;
+        return strlen($value);
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function html(string $string)
+    private function html()
     {
-        $this->value = htmlspecialchars($string, ENT_QUOTES);
+        $value = $this->value;
+        $this->value = htmlspecialchars($value, ENT_QUOTES);
 
         return $this;
     }
 
     /**
-     * @param string $subject
      * @param string $newline
      * @return $this
      */
-    private function newline(string $subject, $newline = "\n")
+    private function newline($newline = "\n")
     {
-        $this->value = preg_replace('/\R/u', $newline, $subject);
+        $value = $this->value;
+        $this->value = preg_replace('/\R/u', $newline, $value);
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function reverse(string $string)
+    private function reverse()
     {
-        $this->value = strrev($string);
+        $value = $this->value;
+        $this->value = strrev($value);
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @param bool   $outputCapitalised
      * @param bool   $ignoreLowerCase
      * @return $this
      */
-    private function acronym(string $string, $outputCapitalised = false, $ignoreLowerCase = false)
+    private function acronym($outputCapitalised = false, $ignoreLowerCase = false)
     {
+        $value = $this->value;
         $str = '';
-        foreach ($this->words($string) as $word) {
+        foreach ($this->words() as $word) {
             if (!$ignoreLowerCase || ($ignoreLowerCase && $word[0] == strtoupper($word[0]))) {
                 $str .= $word[0];
             }
@@ -603,12 +622,16 @@ class Str
      */
     private function parseDir()
     {
-        $return = '';
+        $return = $this->value;
         foreach (func_get_args() as $str) {
-            if ($str == '' || $str == null || $str == false) {
-                continue;
+            if (!is_array($str))
+                $str = [$str];
+            foreach ($str as $string) {
+                if ($string == '' || $string == null || $string == false) {
+                    continue;
+                }
+                $return .= '/' . trim($string, '/');
             }
-            $return .= '/' . trim($str, '/');
         }
         $this->value = $return;
 
@@ -616,106 +639,117 @@ class Str
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function stripExtension(string $string)
+    private function stripExtension()
     {
-        $this->value = preg_replace('/\.([a-z0-9]+)$/i', '', $string);
+        $value = $this->value;
+        $this->value = preg_replace('/\.([a-z0-9]+)$/i', '', $value);
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function hasExtension(string $string)
+    private function hasExtension()
     {
-        return boolval(preg_match('/\.([a-z0-9]+)$/i', $string));
+        $value = $this->value;
+        return boolval(preg_match('/\.([a-z0-9]+)$/i', $value));
     }
 
     /**
-     * @param string $string
      * @param mixed $default
      * @return $this
      */
-    private function getExtension(string $string, $default = null)
+    private function getExtension($default = null)
     {
-        preg_match('/\.([a-z0-9]+)$/i', $string, $m);
+        $value = $this->value;
+        preg_match('/\.([a-z0-9]+)$/i', $value, $m);
         return isset($m[1]) ? $m[1] : $default;
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function url(string $string)
+    private function url()
     {
-        $this->value = trim(strtolower(preg_replace('/[^a-z0-9]+/i', '-', $str)), '-');
+        $value = $this->value;
+        $this->value = trim(strtolower(preg_replace('/[^a-z0-9]+/i', '-', $value)), '-');
 
         return $this;
     }
 
+    private function normalCase() {
+        $value = $this->value;
+        if ($this->contains(' ')) {
+
+        }elseif ($this->contains('_')) {
+            $value = preg_replace('/_/', ' ', $value);
+        }else{
+            $words = preg_split('/(?=[A-Z]|\W)/',$value);
+            preg_match_all('/((?:^|[A-Z])[a-z]+)/',implode(' ', $words), $matches);
+            $value = implode(' ', $matches[0]);
+            $value = preg_replace('/\W+/', ' ', $value);
+        }
+        $value = strtolower($value);
+        return $value;
+    }
+
     /**
-     * @param string $string
      * @return $this
      */
-    private function camelCase(string $string) {
-        $string = preg_replace('/(?<!\ )(?<![A-Z])[A-Z]/', ' $0', $string);
-        $words = $this->words($string, '/\W|_/', true);
+    private function camelCase() {
+        $value = $this->normalCase();
 
-        $words = array_map('strtolower', $words);
-
-        $words = array_map('ucfirst', $words);
+        $words = array_map('ucfirst', explode(' ', $value));
         $this->value = lcfirst(implode('', $words));
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function pascalCase(string $string) {
-        $this->value = ucfirst($this->camelCase($string));
+    private function pascalCase() {
+        $this->value = ucfirst($this->camelCase());
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @return $this
      */
-    private function snakeCase(string $string) {
-        $string = preg_replace('/(?<!\ )(?<![A-Z])[A-Z]/', ' $0', $string);
-        $words = $this->words($string, '/\W/', true);
-        $this->value = strtolower(implode('_', $words));
+    private function snakeCase() {
+        $value = $this->normalCase();
+        $this->value = preg_replace('/\W/', '_', $value);
 
         return $this;
     }
 
     /**
-     * @param string $string
      * @return bool
      */
-    private function isCamelCase(string $string) {
-        return $string==$this->camelCase($string);
+    private function isCamelCase() {
+        $value = $this->value;
+        return $value==$this->camelCase();
     }
 
     /**
-     * @param string $string
      * @return bool
      */
-    private function isPascalCase(string $string) {
-        return $string==$this->pascalCase($string);
+    private function isPascalCase() {
+        $value = $this->value;
+        return $value==$this->pascalCase();
     }
 
     /**
-     * @param string $string
      * @return bool
      */
-    private function isSnakeCase(string $string) {
-        return $string==$this->snakeCase($string);
+    private function isSnakeCase() {
+        $value = $this->value;
+        return $value==$this->snakeCase();
     }
+
+
 }
