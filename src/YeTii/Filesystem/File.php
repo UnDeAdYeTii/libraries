@@ -9,23 +9,23 @@ use YeTii\General\Str;
 
 class File {
 
-	protected $exists;
-	protected $is_dir;
-	protected $has_children;
+	public $exists;
+	public $is_dir;
+	public $has_children;
 
-	protected $name;
-	protected $full_path;
-	protected $extension;
+	public $name;
+	public $full_path;
+	public $extension;
 
-	protected $date_modified;
+	public $date_modified;
 
-	protected $children_count;
-	protected $children;
+	public $children_count;
+	public $children;
 
-	protected $siblings_count;
-	protected $siblings;
+	public $siblings_count;
+	public $siblings;
 
-	protected $parent;
+	public $parent;
 
 	protected $settings = [
 		'show_hidden_files'=>true
