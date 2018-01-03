@@ -2,12 +2,25 @@
 
 Collection of classes/libs
 
-## Unit Testing
+## Structure
 
-This package uses [PHPUnit](https://phpunit.de) for it's unit tests. To run the test suite, use the following:  
-`php vendor/bin/phpunit` or `phpunit` (if installed globally)
+```
+src/
+tests/
+vendor/
+```
 
-## YeTii\General\Str
+## Install
+
+Via Composer
+
+``` bash
+$ composer require undeadyetii/libraries
+```
+
+## Usage
+
+### YeTii\General\Str
 A String class with built-in helpful functions.
 Hint: The Str class can be directly printed as a string to print its string value (`echo $str`)
 
@@ -64,8 +77,7 @@ Str::html($haystack); // and $str->html();
 Str::replace($haystack, $find, $replace, $ignoreCase); // and $str->replace($find, $replace, $ignoreCase);
 ```
 
-
-## YeTii\General\Arr
+### YeTii\General\Arr
 An Array class with built-in helpful functions
 Unlike Str class, Arr cannot automatically cast to an Array, you'll need to go `$arr->toArray()` (`$arr->toObject()` is also supported)
 
@@ -90,9 +102,27 @@ $arr->prepend($new_val); // prepend a value to the beginning of an array
 $arr->first(); // shift first element off array, return shifted value
 $arr->last(); // pop last element off array, return popped value
 
-
 // You can also use Arr class statically (MUST pass source string variable before other args)
 Arr::indexOf($array, $needle, $default = null); // notice the difference? $arr->indexOf($needle, $default = null);
 Arr::at($array, $needle, $default = null); // and $arr->at($needle, $default = null);
 Arr::keys($array); // and $arr->keys();
 ```
+
+## Testing
+
+``` bash
+$ composer test
+```
+
+## Credits
+
+- [undeadyetii][link-author]
+- [All Contributors][link-contributors]
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
+
+[link-packagist]: https://packagist.org/packages/undeadyetii/libraries
+[link-author]: https://github.com/undeadyetii
+[link-contributors]: ../../contributors
