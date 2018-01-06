@@ -70,7 +70,6 @@ $str->parseDir($path1 [, $path2...]); // concatenate all string args into valid 
 $str->stripExtension(); // Remove extension ('Readme.txt' would be 'Readme')
 $str->url(); // Make url-friendly version of the string (lowercase + only A-Z and 0-9 and hyphens for spaces)
 
-
 // You can also use Str class statically (MUST pass source string variable before other args)
 Str::contains($haystack, $needle); // notice the difference? $str->contains($needle);
 Str::html($haystack); // and $str->html();
@@ -106,6 +105,29 @@ $arr->last(); // pop last element off array, return popped value
 Arr::indexOf($array, $needle, $default = null); // notice the difference? $arr->indexOf($needle, $default = null);
 Arr::at($array, $needle, $default = null); // and $arr->at($needle, $default = null);
 Arr::keys($array); // and $arr->keys();
+```
+
+### YeTii\General\Num
+A Number class with built-in helpful functions for managing numbers.
+
+```php
+$num = new Num(10);
+$num->toInt(); //  Convert to an integer
+$num->toNatural(); // Return the absolute value
+$num->toFloat(); // Convert to a float
+$num->value(); // Return the value (or 0 if non-numeric)
+$num->toRomanNumerals(); // Convert the value to Roman numerals
+$num->padZero($length); // Add padding of zeros
+$num->squareRoot(); // Find the square root
+$num->nthRoot(); // Find the nth root
+$num->isPositive(); // Returns true if the value is positive
+$num->isNegative(); // Returns true if the value is negative
+$num->increment(); // Increment the value
+$num->decrement(); // Decrement the value
+$num->round($x); // Round to $x decimal places
+
+Num::romanNumeralsToInt($str); // Convert Roman numerals to an int
+Num::isRomanNumerals($str); // Checks if valid Roman numerals are provided
 ```
 
 ## Testing
